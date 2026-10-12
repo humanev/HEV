@@ -1,0 +1,35 @@
+{
+  "name": "humans-of-ev-5",
+  "private": true,
+  "version": "5.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "server": "node --env-file=.env server/index.js",
+    "server:demo": "node --env-file=.env.demo server/index.js",
+    "build": "vite build",
+    "dev:demo": "vite --mode demo --host 127.0.0.1 --port 5174",
+    "content:import": "node scripts/import-source-content.js",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "better-sqlite3": "^12.2.0",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.1.0",
+    "express-session": "^1.18.2",
+    "helmet": "^8.1.0",
+    "lucide-react": "^0.468.0",
+    "multer": "^2.4.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^7.1.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^6.0.5"
+  },
+  "engines": {
+    "node": ">=20.6"
+  }
+}
