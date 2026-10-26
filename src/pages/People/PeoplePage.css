@@ -1,0 +1,4 @@
+.person-card{border:1px solid var(--line);padding:25px;border-radius:10px}
+.person-avatar{width:72px;height:72px;border-radius:50%;background:var(--navy);color:var(--green);display:grid;place-items:center;font-weight:800;margin-bottom:20px}
+.person-card h3{font-family:"Playfair Display";font-size:23px}
+.person-card>strong{display:block;margin-top:8px;font-size:11px}

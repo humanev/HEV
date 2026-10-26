@@ -1,0 +1,4 @@
+.large-search{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:10px;padding:0 18px;margin-bottom:30px}
+.large-search .cst-input{--cst-input-text-size:18px;--cst-input-radius:0}
+.search-results{display:grid;grid-template-columns:repeat(3,1fr);gap:25px}
+@media (max-width:1100px){.search-results{grid-template-columns:1fr 1fr}}

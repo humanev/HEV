@@ -1,0 +1,7 @@
+
+import {Link} from "react-router-dom";
+import {ArrowUpRight, Play, Zap} from "lucide-react";
+import {imgFallback} from "../../../components/common/PageRuntime";
+
+
+export default function HomeHeroSection({featured}){ return <><section className="hero"><div className="hero-bg"></div><div className="container hero-grid"><div className="hero-copy"><span className="eyebrow light">HUMANS OF EV 5.0</span><h1>The Voice of India’s <em>Electric Mobility</em> Industry</h1><p>Trusted journalism, intelligence, research and executive insight for the people building the electric future.</p><div className="hero-actions"><Link className="primary" to="/news">Explore Intelligence <ArrowUpRight size={17}/></Link><Link className="ghost" to="/membership">Become a Member</Link></div></div><div className="hero-feature"><div className="feature-image"><img src={featured?.image||imgFallback} onError={e=>e.currentTarget.src=imgFallback}/><span className="play"><Play fill="currentColor" size={18}/></span></div><div className="feature-body"><span className="eyebrow">Editor's Pick</span><h3>{featured?.title||"Latest stories are on the way"}</h3><span className="meta">{featured?`${featured.time} · ${featured.author}`:"New reporting is coming soon"}</span></div></div></div><div className="ticker"><div className="ticker-label"><Zap size={14}/> BREAKING</div><div className="ticker-track">India's EV ecosystem crosses a new infrastructure milestone <span>•</span> New battery manufacturing capacity announced <span>•</span> Startup funding activity accelerates</div></div></section></>; }

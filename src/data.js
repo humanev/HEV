@@ -1,6 +1,6 @@
 export const nav = [
   { label: "Home", path: "/" },
-  { label: "Latest News", path: "/news" },
+  { label: "News", path: "/news" },
   { label: "EV Intelligence", path: "/intelligence" },
   { label: "Vehicles", path: "/vehicles" },
   { label: "EV Business", path: "/ev-business" },
@@ -11,6 +11,22 @@ export const nav = [
   { label: "B2B Solutions", path: "/b2b-solutions" }
 ];
 
+export const contactEnquiryTypes = [
+  "General enquiry",
+  "Editorial / newsroom",
+  "Advertising & sponsorship",
+  "Membership & subscriptions",
+  "Research & intelligence",
+  "Events & awards",
+  "Enterprise partnership",
+  "Media enquiry",
+  "Magazine cover page enquiry",
+  "Magazine advertising page enquiry",
+  "Magazine editorial enquiry",
+  "Other magazine-related enquiry",
+  "Careers"
+];
+
 export const stats = [
   ["EV Sales", "1.86M", "+28.4% YoY"],
   ["Public Chargers", "27,800+", "+19.2% YoY"],
@@ -18,13 +34,6 @@ export const stats = [
   ["Startup Funding", "$1.4B", "+22.8% YoY"],
   ["EV Share", "6.8%", "+1.7 pts"],
   ["Manufacturing", "₹38.2K Cr", "+26.1% YoY"]
-];
-
-export const stories = [
-  { id: 1, category:"MARKET", title:"India's EV market enters its next phase of scale, infrastructure and intelligent capital", excerpt:"The next chapter will be defined by charging density, financing, software and resilient supply chains.", author:"Editorial Desk", time:"8 min read", image:"https://images.unsplash.com/photo-1593941707882-a5bba14938c7?auto=format&fit=crop&w=1200&q=80" },
-  { id: 2, category:"BATTERY", title:"The battery race is moving beyond cell chemistry", excerpt:"Manufacturers are investing in localisation, recycling, thermal systems and data.", author:"Ananya Mehta", time:"6 min read", image:"https://images.unsplash.com/photo-1609521263047-f8f205293f24?auto=format&fit=crop&w=1000&q=80" },
-  { id: 3, category:"POLICY", title:"What India's next mobility policy cycle could mean for industry", excerpt:"A closer look at manufacturing incentives, charging networks and clean mobility economics.", author:"Rahul Sharma", time:"7 min read", image:"https://images.unsplash.com/photo-1551830820-330a71b99659?auto=format&fit=crop&w=1000&q=80" },
-  { id: 4, category:"STARTUPS", title:"The new generation of EV startups is building for the entire ecosystem", excerpt:"Software, fleet intelligence, energy and components are opening new venture opportunities.", author:"Priya Nair", time:"5 min read", image:"https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1000&q=80" }
 ];
 
 export const companies = [

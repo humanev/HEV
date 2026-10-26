@@ -1,0 +1,4 @@
+.course{border:1px solid var(--line);padding:25px;border-radius:10px}
+.course-icon{width:48px;height:48px;display:grid;place-items:center;background:#e9f9f1;color:var(--green2);border-radius:8px;margin-bottom:20px}
+.course>span{font-size:9px;letter-spacing:.15em;color:var(--muted)}
+.course h3{font-family:"Playfair Display";font-size:24px}

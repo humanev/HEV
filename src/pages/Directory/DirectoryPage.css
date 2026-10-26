@@ -1,0 +1,20 @@
+.directory-tools{display:flex;gap:10px;margin-bottom:25px}
+.searchbox{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:7px;padding:0 12px;flex:1}
+.searchbox input{border:0}
+.directory-tools select{border:1px solid var(--line);border-radius:7px;padding:0 14px;background:#fff}
+.company-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.company-card{display:flex;align-items:center;gap:15px;border:1px solid var(--line);padding:18px;border-radius:9px}
+.company-logo{width:46px;height:46px;border-radius:9px;background:var(--soft);display:grid;place-items:center;font-weight:900;color:var(--green2)}
+.company-card h3{font-size:14px;margin:0 0 4px}
+.company-card p{font-size:10px;color:var(--muted);margin:0 0 7px}
+.company-card span{font-size:9px;padding:4px 7px;background:#e9f9f1;color:var(--green2);border-radius:20px}
+.company-card>svg{margin-left:auto}
+.metric-row>div svg{color:var(--green2)}
+.metric-row{grid-template-columns:repeat(3,1fr);margin-bottom:60px}
+.funding-list{border-top:1px solid var(--line)}
+.funding-list>div{display:grid;grid-template-columns:100px 1fr 100px;align-items:center;padding:22px 0;border-bottom:1px solid var(--line)}
+.funding-list span{font-size:10px;color:var(--muted)}
+.funding-list h3{font-family:"Playfair Display";font-size:19px;margin:0}
+.funding-list strong{color:var(--green2);text-align:right}
+.dark .company-logo{background:#10242b}
+@media (max-width:700px){.directory-tools{flex-direction:column}.funding-list>div{grid-template-columns:70px 1fr}.funding-list strong{grid-column:2;text-align:left}}

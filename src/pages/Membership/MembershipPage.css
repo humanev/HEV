@@ -1,0 +1,48 @@
+.plans{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;align-items:stretch}
+.plan{position:relative;border:1px solid var(--line);border-radius:10px;padding:28px;display:flex;flex-direction:column}
+.plan.popular{border:2px solid var(--green);box-shadow:0 15px 50px rgba(32,199,122,.12)}
+.popular-label{position:absolute;top:0;right:20px;transform:translateY(-50%);background:var(--green);padding:5px 8px;border-radius:4px;font-size:8px;font-weight:900}
+.plan h2{font-family:"Playfair Display";font-size:25px}
+.plan>p{font-size:11px;color:var(--muted);min-height:38px}
+.plan>strong{font-size:32px;margin:15px 0 22px}
+.plan small{font-size:10px;color:var(--muted);font-weight:400}
+.plan .primary{width:100%}
+.plan ul{list-style:none;padding:15px 0 0;margin:0}
+.plan li{font-size:10px;padding:7px 0;color:#4f6067}
+@media (max-width:1100px){.plans{grid-template-columns:1fr 1fr}}
+.membership-payment-note{margin:25px auto 0;color:var(--muted);font-size:11px;line-height:1.7;text-align:center;max-width:720px}
+.member-auth-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,.85fr);align-items:stretch;gap:28px}
+.member-auth-card{max-width:540px;width:100%;margin:0 auto;border:1px solid var(--line);border-radius:12px;background:var(--bg);overflow:hidden;box-shadow:var(--shadow)}
+.member-auth-tabs{display:grid;grid-template-columns:1fr 1fr;background:var(--soft);border-bottom:1px solid var(--line)}
+.member-auth-tabs .cst-app-button{width:100%;padding:15px;border-bottom:2px solid transparent;color:var(--muted)}
+.member-auth-tabs .cst-app-button.active{border-bottom-color:var(--green2);color:var(--green2)}
+.member-auth-form{padding:30px}
+.member-auth-form>.eyebrow{margin-bottom:8px}
+.member-auth-form h2,.member-upgrade>h2{font-family:"Playfair Display";font-size:30px;margin:0 0 7px}
+.member-auth-form>p{margin:0 0 20px;color:var(--muted);font-size:11px;line-height:1.7}
+.member-auth-form>.cst-input{margin:14px 0;--cst-input-label-font-size:10px;--cst-input-label-font-weight:800;--cst-input-label-color:var(--ink);--cst-input-text-size:12px;--cst-input-radius:6px}
+.member-auth-form>.cst-input .cst-input__field{background:var(--bg)}
+.member-auth-form>.cst-input .cst-input__supporting-text{font-size:9px}
+.member-auth-submit{width:100%;margin-top:8px}
+.member-auth-aside{padding:36px;border-radius:12px;background:var(--navy);color:#fff}
+.member-auth-aside h2{font-family:"Playfair Display";font-size:35px;line-height:1.15;margin:12px 0}
+.member-auth-aside>p{color:#b4c6cb;font-size:12px;line-height:1.8}
+.member-auth-aside ul{display:grid;gap:15px;margin:24px 0 0;padding:0;list-style:none}
+.member-auth-aside li{display:flex;align-items:center;gap:9px;color:#d5e2e5;font-size:11px}
+.member-auth-aside li svg{flex:none;color:var(--green)}
+.member-plan-card{position:relative}
+.member-upgrade{padding-top:52px}
+.member-upgrade>h2{margin:8px 0 20px}
+.member-plan-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
+.member-plan-option{display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding:20px;border:1px solid var(--line);border-radius:9px;background:var(--bg)}
+.member-plan-option.selected{border-color:var(--green);box-shadow:0 0 0 2px rgba(32,199,122,.1)}
+.member-plan-option h3{margin:0;font-family:"Playfair Display";font-size:20px}
+.member-plan-option>strong{font-size:15px}
+.member-plan-option>p{min-height:55px;margin:0;color:var(--muted);font-size:10px;line-height:1.6}
+.member-plan-option .primary,.member-current-plan{margin-top:auto}
+.member-plan-option .primary{width:100%;min-height:38px;border:0;border-radius:6px;font-size:10px;cursor:pointer}
+.member-plan-option .primary:disabled{opacity:.6;cursor:not-allowed}
+.dark .member-auth-tabs{background:#0c222b}
+.dark .member-auth-tabs .cst-app-button.active{--cst-button-tonal-bg:#0a171d}
+@media (max-width:900px){.member-auth-layout{grid-template-columns:1fr}.member-auth-aside{max-width:540px;width:100%;margin:0 auto}}
+@media (max-width:700px){.member-auth-form{padding:22px}.member-auth-aside{padding:26px}.member-auth-aside h2{font-size:30px}.member-plan-card{padding:21px}.member-plan-options{grid-template-columns:1fr}.member-plan-option>p{min-height:0}.member-upgrade{padding-top:38px}}

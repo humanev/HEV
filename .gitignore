@@ -67,12 +67,16 @@ web_modules/
 
 # dotenv environment variable files
 .env
-.env.*
-!.env.example
-!.env.demo.example
+.env*
+env.*
 
 # Local SQLite databases and uploaded content
 data/
+
+# Local editor and generated build files
+.vscode/
+dist/
+node_modules/
 
 # Temporary Office lock files
 ~$*

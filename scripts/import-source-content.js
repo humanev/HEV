@@ -9,11 +9,7 @@ const sourceOrigin = "https://humansofev.info";
 const imageFallback = "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?auto=format&fit=crop&w=1200&q=80";
 const args = new Set(process.argv.slice(2));
 const applyChanges = args.has("--apply");
-const target = process.argv.slice(2).find((value) => value.startsWith("--target="))?.split("=")[1] || "demo";
-if (!["demo", "main"].includes(target)) {
-  throw new Error("Use --target=demo or --target=main.");
-}
-const databasePath = resolve(projectRoot, "data", target === "demo" ? "demo" : "", "humans-of-ev.sqlite");
+const databasePath = resolve(projectRoot, "data", "humans-of-ev.sqlite");
 const categoryIds = { news: 5, article: 4, events: 6, magazine: 91 };
 const interviewTitlePattern = /interview|conversation|sanjay tripathi|arunima singh|rashi gupta|gaurav lohia|grounded currents/i;
 const podcastTitlePattern = /\bpodcast\b|\bepisode\s*#?\d/i;
@@ -158,7 +154,7 @@ if (!applyChanges) {
   process.exit(0);
 }
 if (!existsSync(databasePath)) {
-  throw new Error(`The ${target} SQLite database does not exist at ${databasePath}. Start the local server once to initialize it.`);
+  throw new Error(`The SQLite database does not exist at ${databasePath}. Start the local server once to initialize it.`);
 }
 const db = new Database(databasePath);
 
@@ -180,18 +176,6 @@ const existingManagedSource = db.prepare("SELECT id FROM managed_content WHERE m
 const counts = { news: 0, interviews: 0, podcasts: 0, magazine: 0, events: eventPosts.length };
 
 const importContent = db.transaction(() => {
-  if (target === "demo") {
-    db.prepare(`
-      DELETE FROM articles WHERE title IN (
-        'India''s EV market enters its next phase of scale, infrastructure and intelligent capital',
-        'The battery race is moving beyond cell chemistry',
-        'What India''s next mobility policy cycle could mean for industry',
-        'The new generation of EV startups is building for the entire ecosystem'
-      )
-    `).run();
-    db.prepare("DELETE FROM managed_content WHERE title LIKE 'Demo:%'").run();
-  }
-
   for (const post of newsPosts) {
     const link = sourceLink(post);
     if (existingSourceArticle.get(`%Source: ${link}%`)) continue;

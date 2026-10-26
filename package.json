@@ -6,13 +6,12 @@
   "scripts": {
     "dev": "vite",
     "server": "node --env-file=.env server/index.js",
-    "server:demo": "node --env-file=.env.demo server/index.js",
     "build": "vite build",
-    "dev:demo": "vite --mode demo --host 127.0.0.1 --port 5174",
     "content:import": "node scripts/import-source-content.js",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@material/web": "^2.5.0",
     "bcryptjs": "^3.0.2",
     "better-sqlite3": "^12.2.0",
     "express": "^5.1.0",

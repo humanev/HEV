@@ -1,0 +1,12 @@
+.account-box,.placeholder{max-width:600px;text-align:center;border:1px solid var(--line);border-radius:12px;padding:50px;margin:auto}
+.account-box p,.placeholder p{color:var(--muted);font-size:13px;line-height:1.7}
+.account-box .cst-app-button{margin:5px}
+.member-account{max-width:1000px}
+.member-dashboard{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.member-profile{display:flex;align-items:center;gap:15px}
+.member-profile-icon{width:48px;height:48px;flex:none;display:grid;place-items:center;border-radius:50%;background:#e9f9f1;color:var(--green2)}
+.member-profile>div:nth-child(2){min-width:0;flex:1}
+.member-profile .outline{border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:6px;padding:9px 13px;font-size:10px;font-weight:800;cursor:pointer}
+.member-profile .outline:disabled{opacity:.5}
+@media (max-width:900px){.member-dashboard{grid-template-columns:1fr}}
+@media (max-width:700px){.member-profile{flex-wrap:wrap;padding:20px}.member-profile .outline{margin-left:63px}}
