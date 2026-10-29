@@ -39,13 +39,13 @@ pipeline {
                 --name "$CONTAINER_NAME" \\
                 --restart unless-stopped \\
                 --env-file "$PRODUCTION_ENV_FILE" \\
-                --publish 3001:3001 \\
+                --publish 127.0.0.1:3002:3001 \\
                 --mount "source=$DATA_VOLUME,target=/app/data" \\
                 "$IMAGE_NAME:$BUILD_NUMBER" >/dev/null
               for attempt in $(seq 1 30); do
                 health="$(docker inspect --format='{{.State.Health.Status}}' "$CONTAINER_NAME" 2>/dev/null || true)"
                 if [ "$health" = healthy ]; then
-                  echo 'Production is healthy at http://103.192.198.254:3001.'
+                  echo 'Production is healthy behind HTTPS at https://103.192.198.254:3001.'
                   exit 0
                 fi
                 sleep 2
@@ -54,7 +54,7 @@ pipeline {
               docker rm --force "$CONTAINER_NAME" >/dev/null 2>&1 || true
               if [ -n "$previous_image" ]; then
                 docker run --detach --name "$CONTAINER_NAME" --restart unless-stopped \\
-                  --env-file "$PRODUCTION_ENV_FILE" --publish 3001:3001 \\
+                  --env-file "$PRODUCTION_ENV_FILE" --publish 127.0.0.1:3002:3001 \\
                   --mount "source=$DATA_VOLUME,target=/app/data" "$previous_image" >/dev/null || true
               fi
               echo 'New container did not become healthy; previous image rollback was attempted.'
@@ -67,7 +67,7 @@ pipeline {
 
   post {
     success {
-      echo 'Deployment completed at http://103.192.198.254:3001.'
+      echo 'Deployment completed at https://103.192.198.254:3001.'
     }
   }
 }
