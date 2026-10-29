@@ -201,9 +201,11 @@ for (const [section, content] of Object.entries(siteContentDefaults)) {
 
 const savedNavigation = db.prepare("SELECT content_json FROM site_content WHERE section = 'navigation'").get();
 const previousMenuLabels = ["News", "Intelligence", "People", "Ecosystem", "Media", "Events", "Magazine", "Membership", "Contact"];
+const legacySiteNavigationLabels = ["Home", "News", "EV Intelligence", "Vehicles", "EV Business", "Energy", "People", "HEV Media", "Events", "B2B Solutions"];
 if (savedNavigation) {
   const currentNavigation = JSON.parse(savedNavigation.content_json);
-  if (Array.isArray(currentNavigation) && currentNavigation.map((item) => item.label).join("|") === previousMenuLabels.join("|")) {
+  const currentLabels = Array.isArray(currentNavigation) ? currentNavigation.map((item) => item.label).join("|") : "";
+  if (currentLabels === previousMenuLabels.join("|") || currentLabels === legacySiteNavigationLabels.join("|")) {
     db.prepare("UPDATE site_content SET content_json = ?, updated_at = CURRENT_TIMESTAMP WHERE section = 'navigation'")
       .run(JSON.stringify(siteContentDefaults.navigation));
   } else if (Array.isArray(currentNavigation)) {
@@ -259,6 +261,36 @@ if (!managedContentSchema.includes("'video'")) {
     `);
   })();
 }
+
+const managedContentColumns = db.prepare("PRAGMA table_info(managed_content)").all();
+for (const [column, definition] of [
+  ["slug", "TEXT NOT NULL DEFAULT ''"],
+  ["category", "TEXT NOT NULL DEFAULT ''"],
+  ["series", "TEXT NOT NULL DEFAULT ''"],
+  ["tags", "TEXT NOT NULL DEFAULT ''"],
+  ["placements", "TEXT NOT NULL DEFAULT '[]'"],
+  ["related_content", "TEXT NOT NULL DEFAULT '[]'"],
+  ["featured", "INTEGER NOT NULL DEFAULT 0"],
+  ["publication_at", "TEXT NOT NULL DEFAULT ''"],
+  ["seo_title", "TEXT NOT NULL DEFAULT ''"],
+  ["meta_description", "TEXT NOT NULL DEFAULT ''"],
+  ["canonical_url", "TEXT NOT NULL DEFAULT ''"]
+]) {
+  if (!managedContentColumns.some((item) => item.name === column)) {
+    db.exec(`ALTER TABLE managed_content ADD COLUMN ${column} ${definition}`);
+  }
+}
+const articleColumns = db.prepare("PRAGMA table_info(articles)").all();
+if (!articleColumns.some((item) => item.name === "placements")) {
+  db.exec("ALTER TABLE articles ADD COLUMN placements TEXT NOT NULL DEFAULT '[]'");
+}
+
+db.prepare("DELETE FROM managed_content WHERE slug IN (?, ?, ?, ?)").run(
+  "demo-electric-mobility-transition",
+  "demo-building-electric-future",
+  "demo-electric-mobility-briefing",
+  "demo-maya-kapoor"
+);
 
 class SQLiteSessionStore extends session.Store {
   get(sid, callback) {
@@ -628,6 +660,7 @@ function validateArticle(input) {
     author: [input.author, 100],
     read_time: [input.readTime, 40],
     image: [input.image, 2048],
+    placements: [input.placements ?? "[]", 4000],
     status: [input.status, 12],
     access_level: [input.accessLevel ?? "free", 12]
   };
@@ -640,6 +673,14 @@ function validateArticle(input) {
   }
   if (!["draft", "published"].includes(values.status)) return { error: "Status must be draft or published." };
   if (!["free", "member"].includes(values.access_level)) return { error: "Access level must be free or member." };
+  try {
+    const placements = JSON.parse(values.placements);
+    if (!Array.isArray(placements) || placements.length > 30 || placements.some((value) => typeof value !== "string" || value.length > 180)) {
+      return { error: "placements must be a list of short text values." };
+    }
+  } catch {
+    return { error: "placements must contain valid JSON." };
+  }
   if (!isValidImageReference(values.image)) {
     return { error: "Image must be a valid HTTP or HTTPS URL or an uploaded image." };
   }
@@ -788,6 +829,17 @@ function validateManagedContent(kind, input) {
     issue_label: [input.issueLabel ?? "", 80],
     image: [input.image, 2048],
     media_url: [input.mediaUrl ?? "", 2048],
+    slug: [input.slug ?? "", 180],
+    category: [input.category ?? "", 120],
+    series: [input.series ?? "", 120],
+    tags: [input.tags ?? "", 1000],
+    placements: [input.placements ?? "[]", 4000],
+    related_content: [input.relatedContent ?? "[]", 4000],
+    publication_at: [input.publicationAt ?? "", 40],
+    seo_title: [input.seoTitle ?? "", 180],
+    meta_description: [input.metaDescription ?? "", 320],
+    canonical_url: [input.canonicalUrl ?? "", 2048],
+    featured: [String(input.featured ?? false), 5],
     status: [input.status, 12],
     access_level: [input.accessLevel ?? "free", 12]
   };
@@ -809,8 +861,22 @@ function validateManagedContent(kind, input) {
   if (kind === "video" && !values.media_url) return { error: "A video URL is required." };
   if (!["draft", "published"].includes(values.status)) return { error: "Status must be draft or published." };
   if (!["free", "member"].includes(values.access_level)) return { error: "Access level must be free or member." };
+  values.featured = input.featured === true || input.featured === "true" || input.featured === 1 ? 1 : 0;
   if (values.image && !isValidImageReference(values.image)) {
     return { error: "Image must be a valid HTTP or HTTPS URL or an uploaded image." };
+  }
+  for (const key of ["placements", "related_content"]) {
+    try {
+      const parsed = JSON.parse(values[key]);
+      if (!Array.isArray(parsed) || parsed.length > 30 || parsed.some((value) => typeof value !== "string" || value.length > 180)) {
+        return { error: `${key} must be a list of short text values.` };
+      }
+    } catch {
+      return { error: `${key} must contain valid JSON.` };
+    }
+  }
+  if (values.canonical_url && !/^https?:\/\/\S+$/i.test(values.canonical_url)) {
+    return { error: "Canonical URL must be an HTTP or HTTPS URL." };
   }
   if (!isValidManagedMediaReference(kind, values.media_url)) {
     return { error: "Media URL must be a valid HTTP or HTTPS URL or a supported uploaded file." };
@@ -1373,7 +1439,7 @@ app.post("/api/member/checkout/verify", requireMember, requireCsrf, async (req, 
 app.get("/api/articles", (req, res) => {
   const hasPaidAccess = memberHasPaidAccess(req);
   const articles = db.prepare(`
-    SELECT id, category, title, excerpt, body, author, read_time AS time, image,
+    SELECT id, category, title, excerpt, body, author, read_time AS time, image, placements,
       access_level AS accessLevel, created_at AS createdAt
     FROM articles WHERE status = 'published' ORDER BY created_at DESC, id DESC
   `).all().map((article) => {
@@ -1392,7 +1458,7 @@ app.get("/api/articles/:id", (req, res) => {
   if (id === null) return res.status(400).json({ error: "Article ID must be a positive integer." });
   const hasPaidAccess = memberHasPaidAccess(req);
   const article = db.prepare(`
-    SELECT id, category, title, excerpt, body, author, read_time AS time, image,
+    SELECT id, category, title, excerpt, body, author, read_time AS time, image, placements,
       access_level AS accessLevel, created_at AS createdAt
     FROM articles WHERE id = ? AND status = 'published'
   `).get(id);
@@ -1414,10 +1480,14 @@ app.get("/api/content/:kind", (req, res) => {
   const items = db.prepare(`
     SELECT id, kind, title, description, body, person_name AS personName, role,
       organization, duration, issue_label AS issueLabel, image, media_url AS mediaUrl,
+      slug, category, series, tags, placements, related_content AS relatedContent,
+      featured, publication_at AS publicationAt, seo_title AS seoTitle,
+      meta_description AS metaDescription, canonical_url AS canonicalUrl,
       access_level AS accessLevel, created_at AS createdAt
     FROM managed_content
     WHERE kind = ? AND status = 'published'
-    ORDER BY created_at DESC, id DESC
+      AND (publication_at = '' OR publication_at IS NULL OR publication_at <= CURRENT_TIMESTAMP)
+    ORDER BY featured DESC, COALESCE(NULLIF(publication_at, ''), created_at) DESC, id DESC
   `).all(kind).map((item) => {
     const requiresMembership = item.accessLevel === "member" && !hasPaidAccess;
     return {
@@ -1621,6 +1691,7 @@ app.put("/api/admin/site-content/:section", requirePermission("site.write"), req
 app.get("/api/admin/articles", requirePermission("content.read"), (req, res) => {
   const articles = db.prepare(`
     SELECT id, category, title, excerpt, body, author, read_time AS readTime, image,
+      placements,
       status, access_level AS accessLevel, created_at AS createdAt, updated_at AS updatedAt
     FROM articles ORDER BY updated_at DESC, id DESC
   `).all();
@@ -1633,6 +1704,9 @@ app.get("/api/admin/content/:kind", requirePermission("content.read"), (req, res
   const items = db.prepare(`
     SELECT id, kind, title, description, body, person_name AS personName, role,
       organization, duration, issue_label AS issueLabel, image, media_url AS mediaUrl,
+      slug, category, series, tags, placements, related_content AS relatedContent,
+      featured, publication_at AS publicationAt, seo_title AS seoTitle,
+      meta_description AS metaDescription, canonical_url AS canonicalUrl,
       status, access_level AS accessLevel, created_at AS createdAt, updated_at AS updatedAt
     FROM managed_content WHERE kind = ?
     ORDER BY ${kind === "magazine" ? "created_at" : "updated_at"} DESC, id DESC
@@ -1672,10 +1746,14 @@ app.post("/api/admin/content/:kind", requirePermission("content.write"), require
   const result = db.prepare(`
     INSERT INTO managed_content (
       kind, title, description, body, person_name, role, organization,
-      duration, issue_label, image, media_url, status, access_level
+      duration, issue_label, image, media_url, slug, category, series, tags,
+      placements, related_content, featured, publication_at, seo_title,
+      meta_description, canonical_url, status, access_level
     ) VALUES (
       @kind, @title, @description, @body, @person_name, @role, @organization,
-      @duration, @issue_label, @image, @media_url, @status, @access_level
+      @duration, @issue_label, @image, @media_url, @slug, @category, @series, @tags,
+      @placements, @related_content, @featured, @publication_at, @seo_title,
+      @meta_description, @canonical_url, @status, @access_level
     )
   `).run({ kind, ...values });
   return res.status(201).json({ item: { id: Number(result.lastInsertRowid), kind, ...values } });
@@ -1696,7 +1774,11 @@ app.put("/api/admin/content/:kind/:id", requirePermission("content.write"), requ
       title = @title, description = @description, body = @body,
       person_name = @person_name, role = @role, organization = @organization,
       duration = @duration, issue_label = @issue_label, image = @image,
-      media_url = @media_url, status = @status, access_level = @access_level,
+      media_url = @media_url, slug = @slug, category = @category, series = @series,
+      tags = @tags, placements = @placements, related_content = @related_content,
+      featured = @featured, publication_at = @publication_at, seo_title = @seo_title,
+      meta_description = @meta_description, canonical_url = @canonical_url,
+      status = @status, access_level = @access_level,
       updated_at = CURRENT_TIMESTAMP
     WHERE id = @id AND kind = @kind
   `).run({ id, kind, ...values });
@@ -1719,8 +1801,8 @@ app.post("/api/admin/articles", requirePermission("content.write"), requireCsrf,
   if (error) return res.status(400).json({ error });
   if (values.status === "published" && !canPublishContent(req.adminRole)) return res.status(403).json({ error: "Editors can save drafts. A publisher or owner must publish this article." });
   const result = db.prepare(`
-    INSERT INTO articles (category, title, excerpt, body, author, read_time, image, status, access_level)
-    VALUES (@category, @title, @excerpt, @body, @author, @read_time, @image, @status, @access_level)
+    INSERT INTO articles (category, title, excerpt, body, author, read_time, image, placements, status, access_level)
+    VALUES (@category, @title, @excerpt, @body, @author, @read_time, @image, @placements, @status, @access_level)
   `).run(values);
   return res.status(201).json({ article: { id: Number(result.lastInsertRowid), ...values } });
 });
@@ -1736,7 +1818,7 @@ app.put("/api/admin/articles/:id", requirePermission("content.write"), requireCs
   const result = db.prepare(`
     UPDATE articles
     SET category = @category, title = @title, excerpt = @excerpt, body = @body,
-      author = @author, read_time = @read_time, image = @image, status = @status,
+      author = @author, read_time = @read_time, image = @image, placements = @placements, status = @status,
       access_level = @access_level,
       updated_at = CURRENT_TIMESTAMP
     WHERE id = @id

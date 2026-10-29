@@ -1,4 +1,5 @@
 import { useState } from "react";
+import {CstButton} from "../../../components/common/ui-components";
 import { apiRequest } from "../../../api";
 
 const mediaOptions = {
@@ -19,6 +20,7 @@ const mediaOptions = {
 export default function MediaUploadField({ kind, label, value, onChange, required = false }) {
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
+  const [selectedFile, setSelectedFile] = useState("");
   const options = mediaOptions[kind];
 
   async function uploadMedia(event) {
@@ -28,6 +30,7 @@ export default function MediaUploadField({ kind, label, value, onChange, require
     formData.append("kind", kind);
     formData.append("media", file);
     setUploading(true);
+    setSelectedFile(file.name);
     setUploadError("");
     try {
       const result = await apiRequest("/api/admin/uploads/media", {
@@ -43,6 +46,11 @@ export default function MediaUploadField({ kind, label, value, onChange, require
     }
   }
 
+  function clearMedia() {
+    setSelectedFile("");
+    onChange("");
+    setUploadError("");
+  }
   return <label className="span-two admin-media-field">{label}
     <input
       type="text"
@@ -60,7 +68,8 @@ export default function MediaUploadField({ kind, label, value, onChange, require
         disabled={uploading}
         aria-label={`Upload ${label.toLowerCase()}`}
       />
-      <span>{uploading ? "Uploading media…" : options.hint}</span>
+      <span>{uploading ? "Uploading media…" : selectedFile || options.hint}</span>
+      {value && <CstButton type="button" className="admin-delete-link" onClick={clearMedia}>Remove media</CstButton>}
     </span>
     {uploadError && <span className="admin-image-upload-error" role="alert">{uploadError}</span>}
   </label>;

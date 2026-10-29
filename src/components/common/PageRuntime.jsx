@@ -3,6 +3,7 @@ import {Link} from "react-router-dom";
 import {ArrowUpRight, Bookmark} from "lucide-react";
 import {siteContentDefaults} from "../../data";
 import {apiRequest} from "../../api";
+import {normalizePagePlacements} from "../../features/navigation/sitePages";
 import { CstCard, CstTag } from "./ui-components";
 export const SiteContentContext = React.createContext(siteContentDefaults);
 export const DemoModeContext = React.createContext(false);
@@ -10,14 +11,18 @@ export const SiteContentErrorContext = React.createContext("");
 export const ApiStatusErrorContext = React.createContext("");
 export const imgFallback = "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?auto=format&fit=crop&w=1200&q=80";
 export function useSiteContent(){ return React.useContext(SiteContentContext); }
-export function useArticles(){
+function assignedToPlacement(item, placement){
+ if(!placement)return true;
+ try{const placements=normalizePagePlacements(item.placements);return placements.length===0||placements.includes(placement)}catch{return true}
+}
+export function useArticles(placement){
  const [articles,setArticles]=useState([]); const [error,setError]=useState("");
- useEffect(()=>{let mounted=true; apiRequest("/api/articles").then(({articles:published})=>{if(mounted)setArticles(published)}).catch(e=>{if(mounted)setError(e.message)}); return ()=>{mounted=false};},[]);
+ useEffect(()=>{let mounted=true; apiRequest("/api/articles").then(({articles:published})=>{if(mounted)setArticles(published.filter(item=>assignedToPlacement(item,placement)))}).catch(e=>{if(mounted)setError(e.message)}); return ()=>{mounted=false};},[placement]);
  return {articles,error};
 }
-export function useManagedContent(kind){
+export function useManagedContent(kind, placement){
  const [items,setItems]=useState([]); const [error,setError]=useState("");
- useEffect(()=>{let mounted=true; apiRequest("/api/content/"+kind).then(({items:published})=>{if(mounted){setItems(published);setError("")}}).catch(e=>{if(mounted)setError(e.message)}); return ()=>{mounted=false};},[kind]);
+ useEffect(()=>{let mounted=true; apiRequest("/api/content/"+kind).then(({items:published})=>{if(mounted){setItems(published.filter(item=>assignedToPlacement(item,placement)));setError("")}}).catch(e=>{if(mounted)setError(e.message)}); return ()=>{mounted=false};},[kind,placement]);
  return {items,error};
 }
 

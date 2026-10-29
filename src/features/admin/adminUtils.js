@@ -1,5 +1,6 @@
 import {Mic2, Video, BookOpen, Users, BarChart3, Settings, FileText, Inbox, Mail, ShieldCheck, Activity} from "lucide-react";
 import {readLegacyContactMessage} from "../../contactMetadata";
+import {normalizePagePlacements, pagePlacementOptions, relatedPageOptions} from "../navigation/sitePages";
 
 export const emptyArticle = {
   category: "MARKET",
@@ -9,25 +10,29 @@ export const emptyArticle = {
   author: "Editorial Desk",
   readTime: "5 min read",
   image: "",
+  placements: "[]",
   status: "draft",
   accessLevel: "free"
 };
 
+export const articleCategories = ["BATTERY", "MARKET", "POLICY", "STARTUPS"];
+
 export const managedTypes = {
-  podcasts: { kind: "podcast", label: "Podcasts", icon: Mic2 },
-  videos: { kind: "video", label: "Videos", icon: Video },
+  podcasts: { kind: "podcast", label: "Podcast", icon: Mic2 },
+  videos: { kind: "video", label: "Video", icon: Video },
   magazine: { kind: "magazine", label: "Magazine", icon: BookOpen },
-  cxos: { kind: "cxo", label: "CXO profiles", icon: Users }
+  cxos: { kind: "cxo", label: "Person", icon: Users }
 };
 
 export const tabs = [
   { id: "overview", label: "Overview", icon: BarChart3, roles: ["owner", "editor", "publisher", "support"] },
-  { id: "site-content", label: "Website content", icon: Settings, roles: ["owner"] },
+  { id: "content", label: "Content library", icon: FileText, roles: ["owner", "editor", "publisher"] },
+  { id: "site-content", label: "Page controls", icon: Settings, roles: ["owner"] },
   { id: "articles", label: "News", icon: FileText, roles: ["owner", "editor", "publisher"] },
-  { id: "podcasts", ...managedTypes.podcasts, roles: ["owner", "editor", "publisher"] },
-  { id: "videos", ...managedTypes.videos, roles: ["owner", "editor", "publisher"] },
-  { id: "magazine", ...managedTypes.magazine, roles: ["owner", "editor", "publisher"] },
-  { id: "cxos", ...managedTypes.cxos, roles: ["owner", "editor", "publisher"] },
+  { id: "podcasts", ...managedTypes.podcasts, label: "Podcasts", roles: ["owner", "editor", "publisher"] },
+  { id: "videos", ...managedTypes.videos, label: "Videos", roles: ["owner", "editor", "publisher"] },
+  { id: "magazine", ...managedTypes.magazine, label: "Magazine", roles: ["owner", "editor", "publisher"] },
+  { id: "cxos", ...managedTypes.cxos, label: "People", roles: ["owner", "editor", "publisher"] },
   { id: "enquiries", label: "Enquiries", icon: Inbox, roles: ["owner", "support"] },
   { id: "newsletter", label: "Newsletter", icon: Mail, roles: ["owner", "support"] },
   { id: "team", label: "Team & roles", icon: Users, roles: ["owner"] },
@@ -35,19 +40,31 @@ export const tabs = [
 ];
 
 export const adminMenuGroups = [
-  { label: "Workspace", ids: ["overview"] },
-  { label: "Publishing", ids: ["articles", "podcasts", "videos", "magazine", "cxos"] },
-  { label: "Audience", ids: ["enquiries", "newsletter"] },
-  { label: "Administration", ids: ["site-content", "team", "profile"] }
+  { label: "Dashboard", ids: ["overview"] },
+  { label: "Publishing", ids: ["content", "site-content"] },
+  { label: "Business", ids: ["enquiries", "newsletter"] },
+  { label: "Administration", ids: ["team", "profile"] }
 ];
 
 export const adminRoleLabels = { owner: "Owner", editor: "Editor", publisher: "Publisher", support: "Support" };
 
+export const websitePlacements = pagePlacementOptions;
+export {normalizePagePlacements, relatedPageOptions};
+
+export function readJsonList(value) {
+  try {
+    const parsed = JSON.parse(value || "[]");
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
 export const siteContentSections = [
-  { id: "navigation", label: "Navigation menu", description: "Edit the main desktop and mobile menu, including dropdown links.", type: "json" },
+  { id: "navigation", label: "Website navigation", description: "Add and edit the links visitors see in the main website menu.", type: "navigation" },
   { id: "homeStats", label: "Home page stats", description: "Numbers displayed in the home-page market dashboard.", fields: ["Label", "Value", "Change"] },
   { id: "directory", label: "Company directory", description: "Companies shown in the Startup Hub and company directory.", fields: ["Company", "Sector", "Location", "Stage"] },
-  { id: "events", label: "Events", description: "Upcoming events shown on the events page. Imported event entries may also include an external source link.", fields: ["Event name", "Location", "Date", "Type", "Source / registration URL"], optionalFields: [4] },
+  { id: "events", label: "Events", description: "Upcoming events shown on the events page. Assign an event to other pages to reuse the shared event card.", fields: ["Event name", "Location", "Date", "Type", "Source / registration URL", "Show on additional pages"], optionalFields: [4, 5] },
   { id: "reports", label: "Research reports", description: "Report cards shown in Intelligence and Research.", fields: ["Report title", "Category", "Access label"] },
   { id: "plans", label: "Membership plans", description: "Plan names, display prices, descriptions, and listed benefits.", type: "plans" },
   { id: "dashboardData", label: "Dashboard metrics", description: "Metric cards shown on the intelligence dashboard.", fields: ["Metric", "Value", "Change"] },
@@ -86,6 +103,17 @@ export function emptyManagedContent(kind) {
     issueLabel: "",
     image: "",
     mediaUrl: "",
+    slug: "",
+    category: "",
+    series: "",
+    tags: "",
+    placements: "[]",
+    relatedContent: "[]",
+    featured: false,
+    publicationAt: "",
+    seoTitle: "",
+    metaDescription: "",
+    canonicalUrl: "",
     status: "draft",
     accessLevel: "free",
     kind

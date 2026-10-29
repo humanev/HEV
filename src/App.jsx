@@ -44,6 +44,7 @@ import ContactPage from "./pages/Contact/ContactPage";
 import NewsletterPage from "./pages/Newsletter/NewsletterPage";
 import NotFoundPage from "./pages/NotFound/NotFoundPage";
 import EcosystemLandingPage from "./pages/Landing/EcosystemLandingPage";
+import GenericPage from "./pages/Generic/GenericPage";
 
 export default function App(){
   const [dark,toggle]=useThemeState();
@@ -90,6 +91,7 @@ export default function App(){
         <Route path="/events" element={<EventsLandingPage/>}/>
         <Route path="/events/calendar" element={<EventsPage/>}/>
         <Route path="/b2b-solutions" element={<B2BSolutionsLandingPage/>}/>
+        <Route path="/about" element={<GenericPage section="About HEV"/>}/>
         <Route path="/awards" element={<AwardsPage/>}/>
         <Route path="/learning" element={<LearningPage/>}/>
         <Route path="/community" element={<CommunityPage/>}/>
@@ -104,4 +106,3 @@ export default function App(){
     </Routes>
   </div></ApiStatusErrorContext.Provider></SiteContentErrorContext.Provider></SiteContentContext.Provider></DemoModeContext.Provider></ThemeContext.Provider>;
 }
-

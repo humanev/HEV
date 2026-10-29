@@ -1,7 +1,7 @@
 import { CstButton } from "./components/common/ui-components";
 import {useEffect, useMemo, useState} from "react";
-import {Link} from "react-router-dom";
-import {ArrowLeft, ArrowUpRight, Check, ChevronDown, LogOut, Menu, Plus, ShieldCheck, X} from "lucide-react";
+import {Link, useLocation} from "react-router-dom";
+import {ArrowLeft, ArrowUpRight, Check, ChevronDown, LogOut, Menu, ShieldCheck, X} from "lucide-react";
 import {apiRequest, ApiError} from "./api";
 
 
@@ -11,44 +11,22 @@ import AdminProfile from "./features/admin/components/AdminProfile";
 import NewsletterSubscribers from "./features/admin/components/NewsletterSubscribers";
 import TeamManager from "./features/admin/components/TeamManager";
 import Overview from "./features/admin/components/Overview";
-import ArticleManager from "./features/admin/components/ArticleManager";
 import ArticleEditor from "./features/admin/components/ArticleEditor";
-import ManagedContentManager from "./features/admin/components/ManagedContentManager";
 import ManagedContentEditor from "./features/admin/components/ManagedContentEditor";
 import EnquiryManager from "./features/admin/components/EnquiryManager";
-import {emptyArticle, managedTypes, getEnquiryDisplay, emptyManagedContent, tabs, adminMenuGroups, adminRoleLabels} from "./features/admin/adminUtils";
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+import ContentLibrary from "./features/admin/components/ContentLibrary";
+import {emptyArticle, getEnquiryDisplay, emptyManagedContent, tabs, adminMenuGroups, adminRoleLabels} from "./features/admin/adminUtils";
 
 function AdminPanel({ onSiteContentChange }) {
+  const location = useLocation();
   const [user, setUser] = useState(null);
   const [checkingSession, setCheckingSession] = useState(true);
   const [authMode, setAuthMode] = useState("login");
   const [recoveryCodeSent, setRecoveryCodeSent] = useState(false);
   const [authNotice, setAuthNotice] = useState("");
   const [recoveryChannel, setRecoveryChannel] = useState("email");
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState(() => new URLSearchParams(location.search).get("section") || "overview");
+  const [initialSiteSection, setInitialSiteSection] = useState("navigation");
   const [summary, setSummary] = useState(null);
   const [articles, setArticles] = useState([]);
   const [managedContent, setManagedContent] = useState({ podcast: [], video: [], magazine: [], cxo: [] });
@@ -226,6 +204,7 @@ function AdminPanel({ onSiteContentChange }) {
       author: article.author,
       readTime: article.readTime,
       image: article.image,
+      placements: article.placements || "[]",
       status: article.status,
       accessLevel: article.accessLevel
     });
@@ -293,6 +272,17 @@ function AdminPanel({ onSiteContentChange }) {
       issueLabel: item.issueLabel,
       image: item.image,
       mediaUrl: item.mediaUrl,
+      slug: item.slug || "",
+      category: item.category || "",
+      series: item.series || "",
+      tags: item.tags || "",
+      placements: item.placements || "[]",
+      relatedContent: item.relatedContent || "[]",
+      featured: Boolean(item.featured),
+      publicationAt: item.publicationAt || "",
+      seoTitle: item.seoTitle || "",
+      metaDescription: item.metaDescription || "",
+      canonicalUrl: item.canonicalUrl || "",
       status: item.status,
       accessLevel: item.accessLevel,
       kind: item.kind
@@ -477,18 +467,16 @@ function AdminPanel({ onSiteContentChange }) {
             <span className="admin-overline">HUMANS OF EV / WORKSPACE</span>
             <h1>{activeTab === "overview" ? "Good to see you." : tabs.find((tab) => tab.id === activeTab)?.label}</h1>
             <p>{activeTab === "overview" ? "Here’s what’s happening across your platform." :
-              activeTab === "articles" ? "Create, edit and publish your newsroom content." :
-                activeTab === "site-content" ? "Update navigation and the structured content shown across your website." :
+              activeTab === "content" || activeTab === "articles" ? "Organize every story and media item, and choose all the pages where it should appear." :
+                activeTab === "site-content" ? "Control page sections, navigation, events, reports, plans and shared website details." :
                 activeTab === "newsletter" ? "View newsletter subscriptions and remove addresses when requested." :
                 activeTab === "enquiries" ? "Review and respond to messages from your contact page." :
                 activeTab === "profile" ? "Verify recovery contacts and protect your administrator account." :
                 activeTab === "team" ? "Add administrators and assign workspace access by role." :
                   `Create, edit and publish ${tabs.find((tab) => tab.id === activeTab)?.label.toLowerCase()}.`}</p>
           </div>
-          {activeTab === "articles" && !editingArticle &&
-            <CstButton className="admin-button primary" onClick={beginArticleCreate}><Plus size={16}/> New article</CstButton>}
-          {managedTypes[activeTab] && !editingContent &&
-            <CstButton className="admin-button primary" onClick={() => beginContentCreate(managedTypes[activeTab].kind)}><Plus size={16}/> Add {managedTypes[activeTab].label.replace(/s$/, "")}</CstButton>}
+          {(activeTab === "articles" || activeTab === "content") && !editingArticle && !editingContent &&
+            <div className="admin-library-create"><label className="sr-only" htmlFor="admin-create-content">Create content</label><select id="admin-create-content" defaultValue="" onChange={(event) => { const kind = event.target.value; if (kind === "article") beginArticleCreate(); else if (kind) beginContentCreate(kind); event.target.value = ""; }}><option value="" disabled>＋ Add content</option><option value="article">Article</option><option value="podcast">Podcast</option><option value="video">Video</option><option value="magazine">Magazine issue</option><option value="cxo">People profile</option></select></div>}
         </div>
 
         {error && <div className="admin-alert error" role="alert">{error}</div>}
@@ -500,44 +488,40 @@ function AdminPanel({ onSiteContentChange }) {
           loading={loadingData}
           role={user.role}
           onOpenEnquiries={() => setActiveTab("enquiries")}
-          onOpenArticles={() => setActiveTab("articles")}
+          onOpenArticles={() => setActiveTab("content")}
         />}
 
-        {activeTab === "articles" && (editingArticle
-          ? <ArticleEditor
+        {(activeTab === "articles" || activeTab === "content") && editingArticle && <ArticleEditor
             article={articleForm}
             canPublish={canPublish}
             onChange={setArticleForm}
             onCancel={() => setEditingArticle(null)}
             onSave={saveArticle}
-          />
-          : <ArticleManager
-            articles={articles}
-            loading={loadingData}
-            onEdit={beginArticleEdit}
-            onDelete={deleteArticle}
-            canPublish={user.role === "owner" || user.role === "publisher"}
-          />)}
+          />}
 
-        {activeTab === "site-content" && siteContent && <SiteContentEditor content={siteContent} onSave={saveSiteContent}/>}
+        {(activeTab === "articles" || activeTab === "content") && !editingArticle && !editingContent && <ContentLibrary
+          articles={articles}
+          managedContent={managedContent}
+          events={siteContent?.events || []}
+          loading={loadingData}
+          onEditArticle={beginArticleEdit}
+          onEditContent={beginContentEdit}
+          onEditEvent={() => { setInitialSiteSection("events"); setActiveTab("site-content"); }}
+          onDeleteArticle={deleteArticle}
+          onDeleteContent={deleteContent}
+          canPublish={canPublish}
+        />}
 
-        {managedTypes[activeTab] && (editingContent
-          ? <ManagedContentEditor
-            kind={editingContent.kind}
-            item={contentForm}
-            canPublish={canPublish}
-            onChange={setContentForm}
-            onCancel={() => setEditingContent(null)}
-            onSave={saveContent}
-          />
-          : <ManagedContentManager
-            kind={managedTypes[activeTab].kind}
-            items={managedContent[managedTypes[activeTab].kind]}
-            loading={loadingData}
-            onEdit={beginContentEdit}
-            onDelete={deleteContent}
-            canPublish={user.role === "owner" || user.role === "publisher"}
-          />)}
+        {activeTab === "site-content" && siteContent && <SiteContentEditor content={siteContent} initialSection={initialSiteSection} onSave={saveSiteContent}/>}
+
+        {activeTab === "content" && editingContent && <ManagedContentEditor
+          kind={editingContent.kind}
+          item={contentForm}
+          canPublish={canPublish}
+          onChange={setContentForm}
+          onCancel={() => setEditingContent(null)}
+          onSave={saveContent}
+        />}
 
         {activeTab === "enquiries" && <EnquiryManager
           enquiries={filteredEnquiries}
@@ -558,23 +542,6 @@ function AdminPanel({ onSiteContentChange }) {
     </section>
   </div>;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 export default AdminPanel;

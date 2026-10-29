@@ -1,14 +1,15 @@
 export const nav = [
   { label: "Home", path: "/" },
   { label: "News", path: "/news" },
-  { label: "EV Intelligence", path: "/intelligence" },
   { label: "Vehicles", path: "/vehicles" },
-  { label: "EV Business", path: "/ev-business" },
+  { label: "Business", path: "/ev-business" },
+  { label: "Data", path: "/intelligence" },
   { label: "Energy", path: "/energy" },
-  { label: "People", path: "/people" },
-  { label: "HEV Media", path: "/media" },
+  { label: "Media", path: "/media" },
   { label: "Events", path: "/events" },
-  { label: "B2B Solutions", path: "/b2b-solutions" }
+  { label: "B2B Solutions", path: "/b2b-solutions" },
+  { label: "About HEV", path: "/about" },
+  { label: "Search", path: "/search" }
 ];
 
 export const contactEnquiryTypes = [
