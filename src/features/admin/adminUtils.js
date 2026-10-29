@@ -15,7 +15,7 @@ export const emptyArticle = {
   accessLevel: "free"
 };
 
-export const articleCategories = ["BATTERY", "MARKET", "POLICY", "STARTUPS"];
+export const articleCategories = ["CARS", "TWO WHEELERS", "BUSES", "BATTERY", "CHARGING", "POLICY", "STARTUPS"];
 
 export const managedTypes = {
   podcasts: { kind: "podcast", label: "Podcast", icon: Mic2 },

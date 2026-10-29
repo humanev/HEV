@@ -359,7 +359,7 @@
   .admin-media-library-body h3{font-size:16px}
   .admin-login-card{padding:30px 23px}
 }
-.admin-filter-bar{display:grid;grid-template-columns:minmax(220px,1.5fr) repeat(4,minmax(130px,1fr));gap:10px;padding:0 24px 18px}
+.admin-filter-bar{display:grid;grid-template-columns:minmax(220px,1.5fr) repeat(5,minmax(120px,1fr));gap:10px;padding:0 24px 18px}
 .admin-filter-bar input,.admin-filter-bar select,.admin-site-editor-tools input{width:100%;min-height:40px;padding:0 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit;font-size:12px}
 .admin-site-editor-tools{display:flex;align-items:center;gap:10px}
 .admin-site-editor-tools input{min-width:220px}

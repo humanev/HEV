@@ -14,10 +14,10 @@ function MediaLink({item, type}) {
 }
 
 export default function CXOVoicesPage() {
-  const {items: profiles, error: profileError} = useManagedContent("cxo", "page-people");
-  const {items: podcasts, error: podcastError} = useManagedContent("podcast", "page-people");
-  const {items: videos, error: videoError} = useManagedContent("video", "page-people");
-  const {articles, error: articleError} = useArticles("page-people");
+  const {items: profiles, error: profileError} = useManagedContent("cxo", "page-people-cxo");
+  const {items: podcasts, error: podcastError} = useManagedContent("podcast", "page-people-cxo");
+  const {items: videos, error: videoError} = useManagedContent("video", "page-people-cxo");
+  const {articles, error: articleError} = useArticles("page-people-cxo");
   const {events} = useSiteContent();
   const leadershipNews = articles.filter((article) => /leadership|ceo|founder|executive|cxo/i.test(`${article.title} ${article.category} ${article.excerpt}`)).slice(0, 3);
   const cxoEvents = events.filter((event) => /cxo|executive|leader|forum|roundtable/i.test(event.join(" "))).slice(0, 4);

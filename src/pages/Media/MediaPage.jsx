@@ -8,9 +8,9 @@ import RelatedPageLinks from "../../components/common/RelatedPageLinks";
 import VideoPlayer, {isAudioSource, isVideoFileSource} from "../../features/media/VideoPlayer";
 
 export default function Media({type}){
-  const {items:podcasts,error}=useManagedContent("podcast", "page-media");
+  const {items:podcasts,error}=useManagedContent("podcast", "page-podcasts");
   const isPodcast=type==="Podcasts";
-  const {items:videos,error:videoError}=useManagedContent("video", "page-media");
+  const {items:videos,error:videoError}=useManagedContent("video", "page-videos");
   const mediaItems=isPodcast?podcasts:videos;
   return <><PageHero kicker="MEDIA" title={type} desc={isPodcast?"Executive conversations, technology discussions and industry debates.":"Documentaries, factory visits, panels, interviews and product launches."}/>
     {isPodcast&&error&&<div className="container article-feed-error">Podcast episodes could not be loaded: {error}</div>}

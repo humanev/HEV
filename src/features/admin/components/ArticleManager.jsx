@@ -6,14 +6,14 @@ import {ArrowUpRight, FileText, Trash2} from "lucide-react";
 
 
 
-import {displayDate, readJsonList, websitePlacements} from "../adminUtils";
+import {articleCategories, displayDate, readJsonList, websitePlacements} from "../adminUtils";
 
 export default function ArticleManager({ articles, loading, onEdit, onDelete, canPublish }) {
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("all");
   const [access, setAccess] = useState("all");
   const [placement, setPlacement] = useState("all");
-  const categories = useMemo(() => [...new Set(articles.map((article) => article.category).filter(Boolean))].sort(), [articles]);
+  const categories = useMemo(() => [...new Set([...articleCategories, ...articles.map((article) => article.category).filter(Boolean)])].sort(), [articles]);
   const [category, setCategory] = useState("all");
   const filteredArticles = useMemo(() => {
     const search = query.trim().toLowerCase();

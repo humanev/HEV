@@ -34,11 +34,11 @@ export default function AssignedPageContent({ page }) {
   const isCxoVoices = location.pathname === "/people/cxo-voices";
   const isEventCalendar = location.pathname.startsWith("/events/calendar");
   const items = [
-    ...articles.filter((item) => isAssigned(item, placement) && !(page === "home" || page === "news" && isNewsListing || isCxoVoices)).map((item) => ({ kind: "article", item })),
-    ...videos.filter((item) => isAssigned(item, placement) && page !== "media" && !isCxoVoices).map((item) => ({ kind: "video", item })),
-    ...podcasts.filter((item) => isAssigned(item, placement) && page !== "media" && !isCxoVoices).map((item) => ({ kind: "podcast", item })),
-    ...magazines.filter((item) => isAssigned(item, placement) && page !== "media").map((item) => ({ kind: "magazine", item })),
-    ...people.filter((item) => isAssigned(item, placement) && page !== "people" && !isCxoVoices).map((item) => ({ kind: "people", item })),
+    ...articles.filter((item) => isAssigned(item, placement) && !(page === "home" || page === "news-all" || page === "news" && isNewsListing || isCxoVoices)).map((item) => ({ kind: "article", item })),
+    ...videos.filter((item) => isAssigned(item, placement) && page !== "media" && page !== "videos" && !isCxoVoices).map((item) => ({ kind: "video", item })),
+    ...podcasts.filter((item) => isAssigned(item, placement) && page !== "media" && page !== "podcasts" && !isCxoVoices).map((item) => ({ kind: "podcast", item })),
+    ...magazines.filter((item) => isAssigned(item, placement) && page !== "media" && page !== "magazine" && page !== "magazine-archive").map((item) => ({ kind: "magazine", item })),
+    ...people.filter((item) => isAssigned(item, placement) && page !== "people" && page !== "people-cxo" && !isCxoVoices).map((item) => ({ kind: "people", item })),
     ...(isEventCalendar ? [] : events.filter((event) => { try { const placements = JSON.parse(event[5] || "[]"); return placements.includes(placement) || page === "events" && !placements.length; } catch { return page === "events"; } }).map((event, index) => ({ kind: "event", item: event, id: index })))
   ];
   if (!items.length) return null;
