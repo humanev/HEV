@@ -15,8 +15,6 @@ pipeline {
   stages {
     stage('Build') {
       steps {
-        sh 'npm ci'
-        sh 'npm run build'
         sh 'docker build --pull --tag "$IMAGE_NAME:$BUILD_NUMBER" .'
       }
     }
