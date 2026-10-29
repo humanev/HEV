@@ -352,6 +352,7 @@ if (adminCount === 0) {
 }
 
 const app = express();
+app.set("trust proxy", 1);
 app.disable("x-powered-by");
 const razorpayKeyId = process.env.RAZORPAY_KEY_ID;
 const razorpayKeySecret = process.env.RAZORPAY_KEY_SECRET;
