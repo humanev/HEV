@@ -22,7 +22,7 @@ COPY server ./server
 COPY src/data.js ./src/data.js
 COPY --from=build /app/dist ./dist
 RUN mkdir -p /app/data/uploads /app/data/media \
-  && chown -R node:node /app
+  && chown -R node:node /app/data
 USER node
 EXPOSE 3001
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 CMD ["node", "-e", "fetch('http://127.0.0.1:3001/api/status').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]

@@ -15,7 +15,6 @@ pipeline {
   stages {
     stage('Build') {
       steps {
-        sh 'id && ls -ln /var/run/docker.sock && docker ps --format .'
         sh 'docker build --pull --tag "$IMAGE_NAME:$BUILD_NUMBER" .'
       }
     }
